@@ -7,7 +7,7 @@ function App() {
     return (
         <Router>
             <nav>
-                <Link to="/">Home</Link> | <Link to="/add">Add Component :)</Link> | <Link to="/list">View Components</Link>
+                <Link to="/">Home</Link> | <Link to="/add">Add Component</Link> | <Link to="/list">View Components</Link>
             </nav>
             <Routes>
                 <Route path="/" element={<h1>Welcome to Component Manager</h1>} />
