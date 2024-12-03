@@ -5,7 +5,6 @@ import { Box, List, ListItem, ListItemText, Typography } from '@mui/material';
 const ComputerList = ({ onSelectComputer }) => {
     const [computers, setComputers] = useState([]);
 
-    // Pridobi vse računalnike ob nalaganju komponente
     useEffect(() => {
         axios.get('http://localhost:5000/api/computers')
             .then((response) => setComputers(response.data))
@@ -21,8 +20,8 @@ const ComputerList = ({ onSelectComputer }) => {
                 {computers.map((computer) => (
                     <ListItem
                         key={computer._id}
-                        button
-                        onClick={() => onSelectComputer(computer._id, computer.name)} // Posredujemo ID in ime
+                        component="button" // Use 'component' instead of 'button'
+                        onClick={() => onSelectComputer(computer._id, computer.name)}
                     >
                         <ListItemText
                             primary={computer.name}

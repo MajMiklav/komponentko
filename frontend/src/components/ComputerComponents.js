@@ -4,28 +4,40 @@ import { Box, List, ListItem, ListItemText, Typography, Button, IconButton } fro
 import DeleteIcon from '@mui/icons-material/Delete';
 
 const ComputerComponents = ({ computerId, computerName, onAddComponent }) => {
-    const [components, setComponents] = useState([]); // Store components
-    const [error, setError] = useState(null); // Handle errors
+    const [components, setComponents] = useState([]);
+    const [averagePriceForComputer, setAveragePriceForComputer] = useState(0);
+    const [averagePriceForAll, setAveragePriceForAll] = useState(0);
+    const [error, setError] = useState(null);
 
     // Fetch components from API
     useEffect(() => {
         axios.get(`http://localhost:5000/api/computers/${computerId}/components`)
-            .then((response) => {
-                setComponents(response.data);
-                setError(null);
-            })
+            .then((response) => setComponents(response.data))
             .catch((error) => {
                 console.error('Error fetching components:', error);
                 setError('Failed to fetch components. Please try again later.');
             });
+
+            axios.get(`http://localhost:5000/api/computers/${computerId}/average-price`)
+            .then((response) => {
+                console.log('Average price for selected computer:', response.data);
+                setAveragePriceForComputer(response.data.averagePrice || 0);
+            })
+            .catch((error) => console.error('Error fetching average price for computer:', error));
+
+        // Fetch average price for all components
+        axios.get(`http://localhost:5000/api/computers/average-price/all`)
+            .then((response) => setAveragePriceForAll(response.data.averagePrice || 0))
+            .catch((error) => console.error('Error fetching average price for all components:', error));
     }, [computerId]);
 
     // Delete a component
     const deleteComponent = (componentId) => {
         axios.delete(`http://localhost:5000/api/computers/${computerId}/components/${componentId}`)
             .then(() => {
-                // Remove the deleted component from state
-                setComponents((prevComponents) => prevComponents.filter((comp) => comp._id !== componentId));
+                setComponents((prevComponents) =>
+                    prevComponents.filter((comp) => comp._id !== componentId)
+                );
             })
             .catch((error) => {
                 console.error('Error deleting component:', error);
@@ -35,12 +47,19 @@ const ComputerComponents = ({ computerId, computerName, onAddComponent }) => {
 
     return (
         <Box>
-            {/* Title */}
             <Typography variant="h5" gutterBottom>
                 Components for {computerName}
             </Typography>
 
-            {/* List of components */}
+            {/* Display Average Prices */}
+            <Typography variant="body1" sx={{ mt: 2, mb: 2 }}>
+                <strong>Average Price for Selected Computer:</strong> ${averagePriceForComputer.toFixed(2)}
+            </Typography>
+            <Typography variant="body1" sx={{ mb: 2 }}>
+                <strong>Average Price for All Components:</strong> ${averagePriceForAll.toFixed(2)}
+            </Typography>
+
+            {/* List of Components */}
             {error ? (
                 <Typography variant="body1" color="error">
                     {error}
@@ -49,15 +68,18 @@ const ComputerComponents = ({ computerId, computerName, onAddComponent }) => {
                 <List>
                     {components.length > 0 ? (
                         components.map((component) => (
-                            <ListItem key={component._id} secondaryAction={
-                                <IconButton
-                                    edge="end"
-                                    aria-label="delete"
-                                    onClick={() => deleteComponent(component._id)}
-                                >
-                                    <DeleteIcon />
-                                </IconButton>
-                            }>
+                            <ListItem
+                                key={component._id}
+                                secondaryAction={
+                                    <IconButton
+                                        edge="end"
+                                        aria-label="delete"
+                                        onClick={() => deleteComponent(component._id)}
+                                    >
+                                        <DeleteIcon />
+                                    </IconButton>
+                                }
+                            >
                                 <ListItemText
                                     primary={`${component.name} - $${component.price}`}
                                     secondary={`Description: ${component.description}, User: ${component.user_name}`}

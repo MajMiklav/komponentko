@@ -54,5 +54,4 @@ router.get('/average-price/:name', async (req, res) => {
     }
 });
 
-
 module.exports = router;
