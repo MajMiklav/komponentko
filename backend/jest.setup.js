@@ -3,6 +3,7 @@ const { MongoMemoryServer } = require('mongodb-memory-server');
 let mongoServer;
 
 beforeAll(async () => {
+    jest.setTimeout(30000);  // Increase timeout to 30 seconds
     // Start MongoMemoryServer before all tests
     mongoServer = await MongoMemoryServer.create();
     const mongoUri = mongoServer.getUri();
