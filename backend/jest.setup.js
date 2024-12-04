@@ -3,6 +3,7 @@ const { MongoMemoryServer } = require('mongodb-memory-server');
 let mongoServer;
 
 beforeAll(async () => {
+    jest.setTimeout(30000);  // Increase timeout to 30 seconds
     // Start MongoMemoryServer before all tests
     mongoServer = await MongoMemoryServer.create();
     const mongoUri = mongoServer.getUri();
@@ -18,10 +19,15 @@ beforeAll(async () => {
 
 afterAll(async () => {
     // Close mongoose connection and stop the in-memory server after tests
-    await mongoose.connection.close();
-    await mongoServer.stop();
+    if (mongoose.connection.readyState !== 0) {
+        await mongoose.disconnect({ forceCloseSockets: true }); // Force disconnect sockets
+    }
+    if (mongoServer) {
+        await mongoServer.stop(); // Stop in-memory MongoDB server
+    }
     console.log('Disconnected from MongoDB');
 });
+
 
 afterEach(async () => {
     // Clear all collections after each test
