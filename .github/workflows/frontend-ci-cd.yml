@@ -1,6 +1,5 @@
 name: Frontend CI/CD
 
-# Trigger pipeline on push or pull request to the main branch
 on:
   push:
     branches:
@@ -24,33 +23,25 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 18  # Specify Node.js version compatible with your project
+          node-version: 18  # Specify Node.js version
           cache: 'npm'
 
-      # Step 3: Navigate to the frontend directory
-      - name: Navigate to frontend
-        working-directory: app/komponentko/frontend
-        run: echo "Navigated to frontend directory"
-
-      # Step 4: Install dependencies
+      # Step 3: Install dependencies
       - name: Install dependencies
         working-directory: app/komponentko/frontend
-        run: npm install
+        run: |
+          if [ ! -f "package-lock.json" ]; then
+            echo "Error: package-lock.json not found!"
+            exit 1
+          fi
+          npm ci  # Use `npm ci` for a clean install based on the lock file
 
-      # Step 5: Run tests
+      # Step 4: Run tests
       - name: Run tests
         working-directory: app/komponentko/frontend
         run: npm test
 
-      # Step 6: Build the project
+      # Step 5: Build the frontend
       - name: Build the frontend
         working-directory: app/komponentko/frontend
         run: npm run build
-
-      # Step 7: Save build artifacts (Optional)
-      - name: Upload build artifacts
-        if: success()
-        uses: actions/upload-artifact@v3
-        with:
-          name: frontend-build
-          path: app/komponentko/frontend/build
