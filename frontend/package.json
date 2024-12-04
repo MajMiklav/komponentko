@@ -18,8 +18,9 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "jest --coverage",
+    "test": "jest --coverage --coverageReporters=text --coverageDirectory=coverage",
     "eject": "react-scripts eject"
+
   },
   "eslintConfig": {
     "extends": [
