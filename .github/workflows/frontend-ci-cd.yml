@@ -1,4 +1,4 @@
-name: Frontend CI/CD
+name: Frontend CI/CD Pipeline
 
 on:
   push:
@@ -8,40 +8,47 @@ on:
   pull_request:
     branches:
       - main
-      - staging
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Check out the code
+      # Step 1: Checkout repository
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Step 2: Set up Node.js
+      # Step 2: Debug directory structure
+      - name: Show directory structure
+        run: ls -R
+        shell: bash
+
+      # Step 3: Set up Node.js
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 18  # Specify Node.js version
+          node-version: 18
           cache: 'npm'
 
-      # Step 3: Install dependencies
+      # Step 4: Navigate to frontend directory
       - name: Install dependencies
+        run: npm install
         working-directory: app/komponentko/frontend
-        run: |
-          if [ ! -f "package-lock.json" ]; then
-            echo "Error: package-lock.json not found!"
-            exit 1
-          fi
-          npm ci  # Use `npm ci` for a clean install based on the lock file
 
-      # Step 4: Run tests
+      # Step 5: Run tests
       - name: Run tests
-        working-directory: app/komponentko/frontend
         run: npm test
-
-      # Step 5: Build the frontend
-      - name: Build the frontend
         working-directory: app/komponentko/frontend
+
+      # Step 6: Build frontend
+      - name: Build frontend
         run: npm run build
+        working-directory: app/komponentko/frontend
+
+      # Step 7: Upload build artifacts (optional)
+      - name: Upload build artifacts
+        if: success()
+        uses: actions/upload-artifact@v3
+        with:
+          name: frontend-build
+          path: app/komponentko/frontend/build
