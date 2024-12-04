@@ -1,10 +1,10 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const Computer = require('../models/Computer'); // Model za računalnike
-const Component = require('../models/Component'); // Model za komponente
+const Computer = require('../models/Computer');
+const Component = require('../models/Component');
 const router = express.Router();
 
-// API za pridobitev vseh računalnikov
+// API for getting all computers
 router.get('/', async (req, res) => {
     try {
         const computers = await Computer.find();
@@ -14,7 +14,7 @@ router.get('/', async (req, res) => {
     }
 });
 
-// API za ustvarjanje novega računalnika
+// API for creating a new computer
 router.post('/', async (req, res) => {
     const computer = new Computer({
         name: req.body.name,
@@ -29,7 +29,7 @@ router.post('/', async (req, res) => {
     }
 });
 
-// API za pridobitev vseh komponent za določen računalnik
+// API for getting components of a specific computer
 router.get('/:id/components', async (req, res) => {
     try {
         const components = await Component.find({ computerId: req.params.id });
@@ -39,14 +39,14 @@ router.get('/:id/components', async (req, res) => {
     }
 });
 
-// API za dodajanje nove komponente določenemu računalniku
+// API for adding a component to a specific computer
 router.post('/:id/components', async (req, res) => {
     const component = new Component({
         name: req.body.name,
         description: req.body.description,
         price: req.body.price,
         user_name: req.body.user_name,
-        computerId: req.params.id, // Povezava z računalnikom
+        computerId: req.params.id,
     });
 
     try {
@@ -57,7 +57,7 @@ router.post('/:id/components', async (req, res) => {
     }
 });
 
-// API for deleting a component
+// API for deleting a component from a specific computer
 router.delete('/:id/components/:componentId', async (req, res) => {
     try {
         const component = await Component.findByIdAndDelete(req.params.componentId);
@@ -70,37 +70,43 @@ router.delete('/:id/components/:componentId', async (req, res) => {
     }
 });
 
-// API to calculate the average price of components for a specific computer
+// API for deleting a specific computer
+router.delete('/:id', async (req, res) => {
+    try {
+        const computerId = req.params.id;
+
+        // Try to find and delete the computer
+        const deletedComputer = await Computer.findByIdAndDelete(computerId);
+
+        // If computer was not found, send a 404 response
+        if (!deletedComputer) {
+            return res.status(404).json({ message: 'Computer not found' });
+        }
+
+        // If deleted successfully, send a success message
+        res.status(200).json({ message: 'Computer deleted successfully' });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+// API for calculating the average price of components for a specific computer
 router.get('/:id/average-price', async (req, res) => {
     try {
-        // Convert the provided ID to an ObjectId
         const computerId = new mongoose.Types.ObjectId(req.params.id);
-
-        // Log the ID being queried
-        console.log('Computer ID being queried:', computerId);
-
-        // Run the aggregation pipeline
         const result = await Component.aggregate([
             { $match: { computerId: computerId } },
             { $group: { _id: null, avgPrice: { $avg: "$price" } } }
         ]);
 
-        // Log the aggregation result
-        console.log('Aggregation Result:', result);
-
-        // Check if the result is empty and respond appropriately
         const averagePrice = result.length > 0 ? result[0].avgPrice : 0;
-
         res.json({ averagePrice });
     } catch (err) {
-        console.error('Error calculating average price:', err);
         res.status(500).json({ message: 'Server error calculating average price' });
     }
 });
 
-
-
-// API to get the average price of all components
+// API for getting the average price of all components
 router.get('/average-price/all', async (req, res) => {
     try {
         const averagePrice = await Component.aggregate([
