@@ -21,13 +21,17 @@ const ComponentList = () => {
         <div>
             <h1>Component List</h1>
             <p>Average Price: ${averagePrice.toFixed(2)}</p>
-            <ul>
-                {components.map((component, index) => (
-                    <li key={index}>
-                        {component.name} - {component.description} - ${component.price} (User: {component.user_name})
-                    </li>
-                ))}
-            </ul>
+            {components.length === 0 ? (
+                <p>No components available.</p> // Add this message for clarity
+            ) : (
+                <ul>
+                    {components.map((component, index) => (
+                        <li key={index}>
+                            {component.name} - {component.description} - ${component.price} (User: {component.user_name})
+                        </li>
+                    ))}
+                </ul>
+            )}
         </div>
     );
 };

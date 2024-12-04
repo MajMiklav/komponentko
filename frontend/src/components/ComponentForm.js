@@ -1,58 +1,42 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import ComponentForm from '../components/ComponentForm';
+
 import axios from 'axios';
 
-const ComponentForm = () => {
-    const [name, setName] = useState('');
-    const [description, setDescription] = useState('');
-    const [price, setPrice] = useState('');
-    const [userName, setUserName] = useState('');
+jest.mock('axios');
+global.alert = jest.fn();
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+test('does not submit when fields are empty', async () => {
+    render(<ComponentForm />);
 
-        const newComponent = { name, description, price: parseFloat(price), user_name: userName };
+    const submitButton = screen.getByText('Add Component');
+    fireEvent.click(submitButton);
 
-        try {
-            const response = await axios.post('http://localhost:5000/api/components', newComponent);
-            console.log('Component added:', response.data);
-            setName('');
-            setDescription('');
-            setPrice('');
-            setUserName('');
-        } catch (error) {
-            console.error('Error adding component:', error);
-        }
-    };
+    await waitFor(() => {
+        expect(axios.post).not.toHaveBeenCalled();
+        expect(global.alert).toHaveBeenCalledWith('Please fill out all fields before submitting.');
+    });
+});
 
-    return (
-        <form onSubmit={handleSubmit}>
-            <input
-                type="text"
-                placeholder="Name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-            />
-            <input
-                type="text"
-                placeholder="Description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-            />
-            <input
-                type="number"
-                placeholder="Price"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-            />
-            <input
-                type="text"
-                placeholder="User Name"
-                value={userName}
-                onChange={(e) => setUserName(e.target.value)}
-            />
-            <button type="submit">Add Component</button>
-        </form>
-    );
-};
+test('submits form data when fields are filled', async () => {
+    render(<ComponentForm />);
 
-export default ComponentForm;
+    // Fill out the form
+    fireEvent.change(screen.getByPlaceholderText('Name'), { target: { value: 'GPU' } });
+    fireEvent.change(screen.getByPlaceholderText('Description'), { target: { value: 'High-end GPU' } });
+    fireEvent.change(screen.getByPlaceholderText('Price'), { target: { value: '1500' } });
+    fireEvent.change(screen.getByPlaceholderText('User Name'), { target: { value: 'John Doe' } });
+
+    const submitButton = screen.getByText('Add Component');
+    fireEvent.click(submitButton);
+
+    await waitFor(() => {
+        expect(axios.post).toHaveBeenCalledWith('http://localhost:5000/api/components', {
+            name: 'GPU',
+            description: 'High-end GPU',
+            price: 1500,
+            user_name: 'John Doe',
+        });
+    });
+});
