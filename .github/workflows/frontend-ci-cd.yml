@@ -8,19 +8,24 @@ on:
   pull_request:
     branches:
       - main
+      - staging
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout repository
+      # Step 1: Checkout the code
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Step 2: Debug directory structure
+      # Step 2: Debug the directory structure
       - name: Show directory structure
-        run: ls -R
+        run: |
+          echo "Current workspace:"
+          pwd
+          echo "List of files and folders:"
+          ls -R
         shell: bash
 
       # Step 3: Set up Node.js
@@ -30,20 +35,20 @@ jobs:
           node-version: 18
           cache: 'npm'
 
-      # Step 4: Navigate to frontend directory
+      # Step 4: Install dependencies
       - name: Install dependencies
         run: npm install
-        working-directory: /frontend
+        working-directory: frontend
 
       # Step 5: Run tests
       - name: Run tests
         run: npm test
-        working-directory: /frontend
+        working-directory: frontend
 
-      # Step 6: Build frontend
+      # Step 6: Build the frontend
       - name: Build frontend
         run: npm run build
-        working-directory: /frontend
+        working-directory: frontend
 
       # Step 7: Upload build artifacts (optional)
       - name: Upload build artifacts
@@ -51,4 +56,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: frontend-build
-          path: app/komponentko/frontend/build
+          path: frontend/build
