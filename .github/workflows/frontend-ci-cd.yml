@@ -1,5 +1,6 @@
 name: Frontend CI/CD
 
+# Trigger pipeline on push or pull request to the main branch
 on:
   push:
     branches:
@@ -10,69 +11,46 @@ on:
       - main
       - staging
 
-env:
-  FRONTEND_PATH: 04_DevOps_Deploying/primer/frontend
-
 jobs:
-  # Install Dependencies
-  install-dependencies:
+  build-and-test:
     runs-on: ubuntu-latest
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      # Step 1: Check out the code
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: 20
+      # Step 2: Set up Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18  # Specify Node.js version compatible with your project
+          cache: 'npm'
 
-    - name: Cache node_modules
-      uses: actions/cache@v3
-      with:
-        path: ${{ env.FRONTEND_PATH }}/node_modules
-        key: ${{ runner.os }}-frontend-${{ hashFiles('${{ env.FRONTEND_PATH }}/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-frontend-
+      # Step 3: Navigate to the frontend directory
+      - name: Navigate to frontend
+        working-directory: app/komponentko/frontend
+        run: echo "Navigated to frontend directory"
 
-    - name: Install dependencies
-      run: |
-        cd ${{ env.FRONTEND_PATH }}
-        npm ci
+      # Step 4: Install dependencies
+      - name: Install dependencies
+        working-directory: app/komponentko/frontend
+        run: npm install
 
-  # Build Frontend
-  build-frontend:
-    needs: install-dependencies
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      # Step 5: Run tests
+      - name: Run tests
+        working-directory: app/komponentko/frontend
+        run: npm test
 
-    - name: Build application
-      run: |
-        cd ${{ env.FRONTEND_PATH }}
-        npm run build
+      # Step 6: Build the project
+      - name: Build the frontend
+        working-directory: app/komponentko/frontend
+        run: npm run build
 
-    - name: Upload build artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: frontend-build
-        path: ${{ env.FRONTEND_PATH }}/build/
-
-  # Test Frontend
-  test-frontend:
-    needs: install-dependencies
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-
-    - name: Run tests with coverage
-      run: |
-        cd ${{ env.FRONTEND_PATH }}
-        npm run test:ci
-
-    - name: Upload coverage report
-      uses: actions/upload-artifact@v4
-      with:
-        name: frontend-coverage
-        path: ${{ env.FRONTEND_PATH }}/coverage/
+      # Step 7: Save build artifacts (Optional)
+      - name: Upload build artifacts
+        if: success()
+        uses: actions/upload-artifact@v3
+        with:
+          name: frontend-build
+          path: app/komponentko/frontend/build
