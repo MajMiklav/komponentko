@@ -1,4 +1,4 @@
-name: Frontend CI/CD Pipeline
+name: Frontend CI/CD
 
 on:
   push:
@@ -11,49 +11,77 @@ on:
       - staging
 
 jobs:
-  build-and-test:
+  # Build frontend
+  build-frontend:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout the code
-      - name: Checkout code
-        uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-      # Step 2: Debug the directory structure
-      - name: Show directory structure
-        run: |
-          echo "Current workspace:"
-          pwd
-          echo "List of files and folders:"
-          ls -R
-        shell: bash
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 20
 
-      # Step 3: Set up Node.js
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-          cache: 'npm'
+    - name: Cache node_modules
+      uses: actions/cache@v3
+      with:
+        path: frontend/node_modules
+        key: ${{ runner.os }}-frontend-${{ hashFiles('frontend/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-frontend-
 
-      # Step 4: Install dependencies
-      - name: Install dependencies
-        run: npm install
-        working-directory: frontend
+    - name: Install dependencies
+      run: |
+        cd frontend
+        npm ci
 
-      # Step 5: Run tests
-      - name: Run tests
-        run: npm test
-        working-directory: frontend
+    - name: Build application
+      run: |
+        cd frontend
+        npm run build
 
-      # Step 6: Build the frontend
-      - name: Build frontend
-        run: npm run build
-        working-directory: frontend
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: frontend-build
+        path: frontend/build/
 
-      # Step 7: Upload build artifacts (optional)
-      - name: Upload build artifacts
-        if: success()
-        uses: actions/upload-artifact@v3
-        with:
-          name: frontend-build
-          path: frontend/build
+  # Test frontend
+  test-frontend:
+    needs: build-frontend
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 20
+
+    - name: Cache node_modules
+      uses: actions/cache@v3
+      with:
+        path: frontend/node_modules
+        key: ${{ runner.os }}-frontend-${{ hashFiles('frontend/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-frontend-
+
+    - name: Install dependencies
+      run: |
+        cd frontend
+        npm ci
+
+    - name: Run tests with coverage
+      run: |
+        cd frontend
+        npm test
+
+    - name: Upload coverage report
+      uses: actions/upload-artifact@v4
+      with:
+        name: frontend-coverage
+        path: frontend/coverage/
