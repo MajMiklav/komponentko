@@ -19,10 +19,15 @@ beforeAll(async () => {
 
 afterAll(async () => {
     // Close mongoose connection and stop the in-memory server after tests
-    await mongoose.connection.close();
-    await mongoServer.stop();
+    if (mongoose.connection.readyState !== 0) {
+        await mongoose.disconnect({ forceCloseSockets: true }); // Force disconnect sockets
+    }
+    if (mongoServer) {
+        await mongoServer.stop(); // Stop in-memory MongoDB server
+    }
     console.log('Disconnected from MongoDB');
 });
+
 
 afterEach(async () => {
     // Clear all collections after each test
