@@ -120,7 +120,7 @@ function App() {
                 )}
 
                 {/* View Shops */}
-                {currentView === 'viewShops' && <ShopList />} {/* Render ShopList */}
+                {currentView === 'viewShops' && <ShopList />} {/* Render ShopList a*/}
             </Container>
         </div>
     );
