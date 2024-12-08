@@ -3,20 +3,21 @@ import ComputerList from './components/ComputerList';
 import ComputerComponents from './components/ComputerComponents';
 import AddComponent from './components/AddComponent';
 import AddComputer from './components/AddComputer';
+import ShopList from './components/ShopList'; // Import ShopList
 import { AppBar, Toolbar, Button, Typography, Container, Box } from '@mui/material';
 
 function App() {
-    const [currentView, setCurrentView] = useState('home'); // Privzeti pogled
-    const [selectedComputer, setSelectedComputer] = useState(null); // Izbrani računalnik (ID in ime)
+    const [currentView, setCurrentView] = useState('home'); // Default view
+    const [selectedComputer, setSelectedComputer] = useState(null); // Selected computer
 
-    // Funkcija za navigacijo med pogledi
+    // Function to navigate between views
     const handleNavigation = (view) => {
         setCurrentView(view);
     };
 
     return (
         <div>
-            {/* Navigacijska vrstica */}
+            {/* Navigation Bar */}
             <AppBar position="static">
                 <Toolbar>
                     <Typography variant="h6" sx={{ flexGrow: 1 }}>
@@ -31,12 +32,15 @@ function App() {
                     <Button color="inherit" onClick={() => handleNavigation('addComputer')}>
                         Add Computer
                     </Button>
+                    <Button color="inherit" onClick={() => handleNavigation('viewShops')}>
+                        View Shops
+                    </Button> {/* New Button for Shops */}
                 </Toolbar>
             </AppBar>
 
-            {/* Glavna vsebina */}
+            {/* Main Content */}
             <Container sx={{ mt: 4 }}>
-                {/* Naslovna stran */}
+                {/* Home Page */}
                 {currentView === 'home' && (
                     <Box textAlign="center">
                         <Typography variant="h4" gutterBottom>
@@ -56,17 +60,17 @@ function App() {
                     </Box>
                 )}
 
-                {/* Pregled računalnikov */}
+                {/* View Computers */}
                 {currentView === 'viewComputers' && (
                     <ComputerList
                         onSelectComputer={(id, name) => {
-                            setSelectedComputer({ id, name }); // Nastavimo ID in ime računalnika
+                            setSelectedComputer({ id, name }); // Set selected computer
                             handleNavigation('viewComponents');
                         }}
                     />
                 )}
 
-                {/* Pregled komponent računalnika */}
+                {/* View Components */}
                 {currentView === 'viewComponents' && selectedComputer && (
                     <Box>
                         <Button
@@ -78,13 +82,13 @@ function App() {
                         </Button>
                         <ComputerComponents
                             computerId={selectedComputer.id}
-                            computerName={selectedComputer.name} // Posredujemo ime računalnika
+                            computerName={selectedComputer.name} // Pass computer name
                             onAddComponent={() => handleNavigation('addComponent')}
                         />
                     </Box>
                 )}
 
-                {/* Dodajanje komponent */}
+                {/* Add Component */}
                 {currentView === 'addComponent' && selectedComputer && (
                     <Box>
                         <Button
@@ -101,7 +105,7 @@ function App() {
                     </Box>
                 )}
 
-                {/* Dodajanje računalnika */}
+                {/* Add Computer */}
                 {currentView === 'addComputer' && (
                     <Box>
                         <Button
@@ -114,6 +118,9 @@ function App() {
                         <AddComputer onComputerAdded={() => handleNavigation('viewComputers')} />
                     </Box>
                 )}
+
+                {/* View Shops */}
+                {currentView === 'viewShops' && <ShopList />} {/* Render ShopList */}
             </Container>
         </div>
     );
