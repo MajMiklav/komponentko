@@ -105,7 +105,7 @@ function App() {
                     </Box>
                 )}
 
-                {/* Add Computer */}
+                {/* Add Computer a*/}
                 {currentView === 'addComputer' && (
                     <Box>
                         <Button
