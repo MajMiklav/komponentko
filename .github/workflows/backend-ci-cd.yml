@@ -87,3 +87,18 @@ jobs:
       with:
         name: backend-coverage  # Coverage artifact name
         path: backend/coverage/  # Path to the coverage report folder
+
+  # Job for deploying to Render
+  deploy-backend:
+    needs: test-backend  # Runs after the backend tests are successful
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Deploy to Render
+      uses: renderinc/render-deploy-action@v1
+      with:
+        service-id: ${{ secrets.RENDER_BACKEND_SERVICE_ID }}
+        api-key: ${{ secrets.RENDER_API_KEY }}
