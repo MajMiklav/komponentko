@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Box, TextField, Button, Typography } from '@mui/material';
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
 
 const AddComponent = ({ computerId, onComponentAdded }) => {
     const [name, setName] = useState('');
@@ -16,7 +18,7 @@ const AddComponent = ({ computerId, onComponentAdded }) => {
         }
 
         // Klic API-ja za dodajanje komponente
-        axios.post(`http://localhost:5000/api/computers/${computerId}/components`, {
+        axios.post(`${API_BASE_URL}/api/computers/${computerId}/components`, {
             name,
             description,
             price: parseFloat(price),

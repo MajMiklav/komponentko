@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Box, List, ListItem, ListItemText, Typography, Button, IconButton } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
 
 const ComputerComponents = ({ computerId, computerName, onAddComponent }) => {
     const [components, setComponents] = useState([]);
@@ -11,14 +13,14 @@ const ComputerComponents = ({ computerId, computerName, onAddComponent }) => {
 
     // Fetch components from API
     useEffect(() => {
-        axios.get(`http://localhost:5000/api/computers/${computerId}/components`)
+        axios.get(`${API_BASE_URL}/api/computers/${computerId}/components`)
             .then((response) => setComponents(response.data))
             .catch((error) => {
                 console.error('Error fetching components:', error);
                 setError('Failed to fetch components. Please try again later.');
             });
 
-            axios.get(`http://localhost:5000/api/computers/${computerId}/average-price`)
+            axios.get(`${API_BASE_URL}/api/computers/${computerId}/average-price`)
             .then((response) => {
                 console.log('Average price for selected computer:', response.data);
                 setAveragePriceForComputer(response.data.averagePrice || 0);
@@ -26,14 +28,14 @@ const ComputerComponents = ({ computerId, computerName, onAddComponent }) => {
             .catch((error) => console.error('Error fetching average price for computer:', error));
 
         // Fetch average price for all components
-        axios.get(`http://localhost:5000/api/computers/average-price/all`)
+        axios.get(`${API_BASE_URL}/api/computers/average-price/all`)
             .then((response) => setAveragePriceForAll(response.data.averagePrice || 0))
             .catch((error) => console.error('Error fetching average price for all components:', error));
     }, [computerId]);
 
     // Delete a component
     const deleteComponent = (componentId) => {
-        axios.delete(`http://localhost:5000/api/computers/${computerId}/components/${componentId}`)
+        axios.delete(`${API_BASE_URL}/api/computers/${computerId}/components/${componentId}`)
             .then(() => {
                 setComponents((prevComponents) =>
                     prevComponents.filter((comp) => comp._id !== componentId)

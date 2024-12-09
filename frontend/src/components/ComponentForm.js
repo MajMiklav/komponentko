@@ -2,6 +2,8 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import ComponentForm from '../components/ComponentForm';
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
 import axios from 'axios';
 
 jest.mock('axios');
@@ -32,7 +34,7 @@ test('submits form data when fields are filled', async () => {
     fireEvent.click(submitButton);
 
     await waitFor(() => {
-        expect(axios.post).toHaveBeenCalledWith('http://localhost:5000/api/components', {
+        expect(axios.post).toHaveBeenCalledWith(`${API_BASE_URL}/api/components`, {
             name: 'GPU',
             description: 'High-end GPU',
             price: 1500,

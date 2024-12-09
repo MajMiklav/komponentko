@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import AddComputer from '../src/components/AddComputer';
 import axios from 'axios';
-
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 jest.mock('axios');
 
 describe('AddComputer', () => {
@@ -28,7 +28,7 @@ describe('AddComputer', () => {
 
     // Ensure API is called with the correct data
     expect(axios.post).toHaveBeenCalledWith(
-      'http://localhost:5000/api/computers',
+      `${API_BASE_URL}/api/computers`,
       { name: 'Office PC', description: 'A computer for office work' }
     );
 

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Box, TextField, Button, Typography } from '@mui/material';
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
 const AddComputer = ({ onComputerAdded }) => {
     const [name, setName] = useState('');
@@ -9,7 +10,7 @@ const AddComputer = ({ onComputerAdded }) => {
     const handleAddComputer = () => {
         if (!name) return alert('Please provide a name for the computer.');
 
-        axios.post('http://localhost:5000/api/computers', { name, description })
+        axios.post(`${API_BASE_URL}/api/computers`, { name, description })
             .then(() => {
                 alert('Computer added successfully!');
                 setName('');

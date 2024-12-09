@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
 
 const ComponentList = () => {
     const [components, setComponents] = useState([]);
@@ -7,12 +9,12 @@ const ComponentList = () => {
 
     useEffect(() => {
         // Fetch all components
-        axios.get('http://localhost:5000/api/components')
+        axios.get(`${API_BASE_URL}/api/components`)
             .then((response) => setComponents(response.data))
             .catch((error) => console.error('Error fetching components:', error));
 
         // Fetch average price
-        axios.get('http://localhost:5000/api/components/average-price')
+        axios.get(`${API_BASE_URL}/api/components/average-price`)
             .then((response) => setAveragePrice(response.data.averagePrice || 0))
             .catch((error) => console.error('Error fetching average price:', error));
     }, []);
