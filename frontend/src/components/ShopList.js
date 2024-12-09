@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Box, List, ListItem, ListItemText, Typography } from '@mui/material';
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
 const ShopList = () => {
     const [shops, setShops] = useState([]);
@@ -9,7 +10,7 @@ const ShopList = () => {
 
     useEffect(() => {
         axios
-            .get('http://localhost:5000/api/shops')
+            .get(`${API_BASE_URL}/api/shops`)
             .then((response) => {
                 setShops(response.data);
                 setLoading(false);
