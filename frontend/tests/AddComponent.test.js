@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import AddComponent from '../src/components/AddComponent';
 import axios from 'axios';
-
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 jest.mock('axios');
 
 describe('AddComponent', () => {
@@ -30,7 +30,7 @@ describe('AddComponent', () => {
 
     // Ensure API is called with the correct data
     expect(axios.post).toHaveBeenCalledWith(
-      'http://localhost:5000/api/computers/123/components',
+      `${API_BASE_URL}/api/computers/123/components`,
       {
         name: 'GPU',
         description: 'High-end GPU',

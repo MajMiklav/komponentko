@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import AddComponent from '../src/components/AddComponent';
-
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 test('renders AddComponent form correctly', () => {
     // Render the AddComponent
     render(<AddComponent computerId="123" onComponentAdded={jest.fn()} />);

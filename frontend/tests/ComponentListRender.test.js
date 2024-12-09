@@ -3,7 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import axios from 'axios';
 import ComponentList from '../src/components/ComponentList';
-
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 jest.mock('axios');
 
 describe('ComponentList', () => {
@@ -14,10 +14,10 @@ describe('ComponentList', () => {
     test('renders a message when no components are available', async () => {
         // Mock API responses
         axios.get.mockImplementation((url) => {
-            if (url === 'http://localhost:5000/api/components') {
+            if (url === `${API_BASE_URL}/api/components`) {
                 return Promise.resolve({ data: [] }); // Empty components list
             }
-            if (url === 'http://localhost:5000/api/components/average-price') {
+            if (url === `${API_BASE_URL}/api/components/average-price`) {
                 return Promise.resolve({ data: { averagePrice: 0 } }); // Zero average price
             }
             return Promise.reject(new Error('Unknown URL'));
@@ -36,7 +36,7 @@ describe('ComponentList', () => {
     test('renders a list of components when data is available', async () => {
         // Mock API responses with components
         axios.get.mockImplementation((url) => {
-            if (url === 'http://localhost:5000/api/components') {
+            if (url === `${API_BASE_URL}/api/components`) {
                 return Promise.resolve({
                     data: [
                         { name: 'GPU', description: 'High-end GPU', price: 1500, user_name: 'John' },
@@ -44,7 +44,7 @@ describe('ComponentList', () => {
                     ],
                 });
             }
-            if (url === 'http://localhost:5000/api/components/average-price') {
+            if (url === `${API_BASE_URL}/api/components/average-price`) {
                 return Promise.resolve({ data: { averagePrice: 900 } });
             }
             return Promise.reject(new Error('Unknown URL'));

@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import axios from 'axios';
 import ComponentList from '../src/components/ComponentList';
-
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 jest.mock('axios');
 
 describe('ComponentList', () => {
@@ -20,10 +20,10 @@ describe('ComponentList', () => {
 
         // Mock API responses
         axios.get.mockImplementation((url) => {
-            if (url === 'http://localhost:5000/api/components') {
+            if (url === `${API_BASE_URL}/api/components`) {
                 return Promise.resolve({ data: mockComponents });
             }
-            if (url === 'http://localhost:5000/api/components/average-price') {
+            if (url === `${API_BASE_URL}/api/components/average-price`) {
                 return Promise.resolve({ data: mockAveragePrice });
             }
             return Promise.reject(new Error('Unknown URL'));
@@ -43,8 +43,8 @@ describe('ComponentList', () => {
         expect(screen.getByText('CPU - Powerful CPU - $300 (User: Jane Doe)')).toBeInTheDocument();
 
         // Ensure axios calls were made
-        expect(axios.get).toHaveBeenCalledWith('http://localhost:5000/api/components');
-        expect(axios.get).toHaveBeenCalledWith('http://localhost:5000/api/components/average-price');
+        expect(axios.get).toHaveBeenCalledWith(`${API_BASE_URL}/api/components`);
+        expect(axios.get).toHaveBeenCalledWith(`${API_BASE_URL}/api/components/average-price`);
     });
 
     test('handles errors gracefully', async () => {
@@ -58,8 +58,8 @@ describe('ComponentList', () => {
         await waitFor(() => expect(screen.getByText('Component List')).toBeInTheDocument());
 
         // Ensure axios calls were made
-        expect(axios.get).toHaveBeenCalledWith('http://localhost:5000/api/components');
-        expect(axios.get).toHaveBeenCalledWith('http://localhost:5000/api/components/average-price');
+        expect(axios.get).toHaveBeenCalledWith(`${API_BASE_URL}/api/components`);
+        expect(axios.get).toHaveBeenCalledWith(`${API_BASE_URL}/api/components/average-price`);
 
         // Since there are no components, the list should be empty
         expect(screen.queryByText(/- \$/)).not.toBeInTheDocument();
