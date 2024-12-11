@@ -104,7 +104,7 @@ jobs:
         id: build-image
         run: |
           # Determine the tag based on the branch
-          if [[ "${GITHUB_REF}" == refs/heads/feature/* ]]; then
+          if [[ "${GITHUB_REF}" == refs/heads/feature ]]; then
             TAG="development"
           elif [[ "${GITHUB_REF}" == refs/heads/staging ]]; then
             TAG="staging"
