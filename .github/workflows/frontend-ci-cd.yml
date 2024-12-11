@@ -87,6 +87,7 @@ jobs:
         path: frontend/coverage/
 
   dockerize-and-push:
+      needs: test-frontend
       runs-on: ubuntu-latest
   
       steps:
