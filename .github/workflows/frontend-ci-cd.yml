@@ -155,7 +155,7 @@ jobs:
           -Dsonar.javascript.lcov.reportPaths=frontend/coverage/lcov.info,backend/coverage/lcov.info
 
 
-  # Deploy to Firebase Hosting
+  # Deploy to Firebase Hostingg
   deploy-to-firebase:
     needs: sonarcloud
     runs-on: ubuntu-latest
