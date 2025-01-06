@@ -125,10 +125,41 @@ jobs:
           docker push ${{ secrets.DOCKER_USERNAME }}/frontend:${{ steps.build-image.outputs.tag }}
           docker push ${{ secrets.DOCKER_USERNAME }}/frontend:${{ github.sha }}
 
-  # Deploy to Firebase Hosting
-  deploy-to-firebase:
+  # SonarCloud analysis
+  sonarcloud:
     needs: test-frontend
     runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 20
+
+    - name: Install SonarCloud Scanner
+      run: npm install -g sonarqube-scanner
+
+    - name: Run SonarCloud Analysis
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      run: |
+        npx sonarqube-scanner \
+          -Dsonar.projectKey=${{ secrets.PROJECT_KEY }} \
+          -Dsonar.organization=${{ secrets.ORGANIZATION_KEY }} \
+          -Dsonar.host.url=https://sonarcloud.io \
+          -Dsonar.sources=. \
+          -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/build/** \
+          -Dsonar.javascript.lcov.reportPaths=frontend/coverage/lcov.info,backend/coverage/lcov.info
+
+
+  # Deploy to Firebase Hosting
+  deploy-to-firebase:
+    needs: sonarcloud
+    runs-on: ubuntu-latest
+    if: success()
 
     steps:
     - name: Checkout code
